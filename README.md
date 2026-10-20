@@ -1,84 +1,93 @@
-# Tenang — a calm budgeting agent for Indonesian students in Beijing
+# Tenang — calm budgeting for Indonesian students in Beijing
 
-**Topic C · Cross-border & Student Finance Assistant** (Fintechathon International Track, theme "AI as a Financial Participant")
+**Topic C · Cross-border & Student Finance Assistant**
 
-Tenang is an on-device AI budgeting agent. A student types expenses and questions in plain words ("lunch canteen 14", "es kopi Rp 22.000", "can I afford ¥300 shoes?"). The agent records spending in yuan and rupiah with a live exchange rate, tracks the month against a Beijing budget, compares remittance quotes by what actually arrives, and explains every decision. It works under four permission tiers and **never moves money**.
+Tenang helps Indonesian students moving from Jakarta to Beijing plan their money before they fly. It shows every cost in yuan and rupiah with a live exchange rate, and it explains prices in things students already know from home.
 
 ## Features
 
-| Area | What it does |
+| Feature | What it does |
 | --- | --- |
-| Agent (Today) | Plain-language input → intent, amount, currency, date, category. Tier 0–3 policy with confirmation cards and reasons. |
-| Live FX | CNY→IDR from 3 key-less public APIs, cross-checked (median, 2% disagreement warning), 6-hour cache, safe fallback. |
-| Budget | Beijing plan builder (housing, food, fun slider, other categories), per-category progress. |
-| Insights | Safe-to-spend today, end-of-month projection, categories running ahead, anomaly detection. |
-| Expenses | Manual add, filter, recategorise (agent learns the word), delete with confirmation, CSV export (formula-injection safe). |
-| Transfer check | Ranks remittance quotes by yuan received and true cost (fee + hidden rate margin). Simulation only. |
-| Price feel | Converts a Beijing price into rupiah and familiar Jakarta items. |
-| Activity log | SHA-256 hash-chained log of every user, agent and system action; integrity check; JSON export (execution evidence). |
-| Settings | Auto-add limit, "confirm everything", fixed rate override, export/import (validated), sample month, delete all. |
+| **Budget** | Pick housing (dorm, shared flat, studio) and food style (canteen, mixed, eating out), edit transport, phone, study and other costs, and set fun money with a slider. Shows the monthly total in ¥ and Rp with a breakdown. |
+| **Tip for you** | Friendly money tips. Tips that match your budget come first and say why (for example, "Because you picked Studio apartment"). |
+| **Price feel** | Converts a Beijing price into rupiah and Jakarta equivalents (es kopi susu, TransJakarta, warung nasi goreng, Telkomsel packs). Pick an item or type your own price. |
+| **Transfer check** | Compares up to 3 remittance quotes by the yuan that actually arrives, the hidden rate margin and the true cost. Simulation only: Tenang never sends money. |
+| **Live or manual rate** | In Transfer check, choose **Live rate** (fetched automatically) or **Manual (fixed) rate** (for example, your bank's rate). The choice applies to the whole app and is saved in the browser. |
 
-## Run locally
+## How the live exchange rate works
 
-No build step, no dependencies, no account.
-
-```bash
-git clone <your-repo-url>
-cd tenang-app
-# Option 1: open index.html directly in Chrome, Edge, Firefox or Safari
-# Option 2 (recommended): serve over http
-python3 -m http.server 8080
-# then open http://localhost:8080
-```
-
-Click **Load sample month** (Today or Settings) to try every feature with a sandbox account.
-
-## Deploy
-
-Any static host works, because the app is plain HTML, CSS and JavaScript.
-
-- **GitHub Pages:** push the folder to a repository → Settings → Pages → Deploy from branch → `main` / root. The app is served over HTTPS at `https://<user>.github.io/<repo>/`.
-- **Netlify / Vercel / Cloudflare Pages:** create a new site from the repository, no build command, publish directory = repository root.
-
-Recommended production headers (the page already ships a Content-Security-Policy meta tag): `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `frame-ancestors 'none'` in the CSP header.
-
-## Tests
-
-Open `tests/index.html` in a browser (or `http://localhost:8080/tests/`). 30 test cases run automatically and print pass/fail.
-
-| ID | Covers |
-| --- | --- |
-| TC01–TC05 | Number, money, currency and date parsing (Indonesian and English formats) |
-| TC06–TC07 | Category classifier and learning from corrections |
-| TC08–TC10 | Intent detection; tier-3 blocking of money movement, trading, credentials |
-| TC11–TC13 | Permission policy: auto, confirm, rate limit |
-| TC14–TC16 | Month insights, overspend detection, anomaly z-score |
-| TC17–TC18 | Remittance analysis and ranking |
-| TC19–TC21 | FX engine: median, outlier rejection, disagreement warning, cache and fallback |
-| TC22–TC23 | SHA-256 test vector, hash-chain tamper detection |
-| TC24 | Data validation and inert text (XSS strings stay plain text) |
-| TC25–TC30 | Agent end to end: auto add, rupiah conversion, confirmation, decline, block, invalid amounts |
+1. Tenang asks three free public APIs (no API key) at the same time:
+   - [ExchangeRate-API open access](https://open.er-api.com)
+   - [Frankfurter (ECB reference rates)](https://frankfurter.dev)
+   - [fawazahmed0 currency-api on jsDelivr](https://github.com/fawazahmed0/exchange-api)
+2. Each value must be between Rp 1,500 and Rp 3,500 per ¥1, otherwise it is ignored.
+3. Tenang uses the **median** of the valid values, so one wrong source cannot change the rate.
+4. The result is cached for 6 hours. If all sources fail, Tenang uses the last known rate, then the example rate Rp 2,250, and says so in the header.
 
 ## Project structure
 
 ```
-index.html            app shell, CSP, views
-css/styles.css        design system (Tenang palette, responsive)
-js/utils.js           formatting, validation, safe DOM builder
-js/fx.js              live exchange-rate engine
-js/audit.js           SHA-256 hash-chained activity log
-js/store.js           local data store + schema validation
-js/agent.js           parser, classifier, insights, anomaly, policy, transfer analysis
-js/agent-runtime.js   agent: message → policy → tool → explanation → log
-js/demo.js            seeded sample month (sandbox account)
-js/app.js             UI controller
-tests/                browser test runner + 30 test cases
+tenang-app/
+├── index.html   page structure and Content-Security-Policy
+├── styles.css   design (cream, jade, coral; Bricolage Grotesque + Instrument Sans)
+├── app.js       all logic: budget, tips, price feel, transfer check, exchange rate
+└── README.md
 ```
 
-## Data sources
+No framework, no build step, no backend.
 
-Exchange rates: [ExchangeRate-API open access](https://open.er-api.com), [Frankfurter (ECB)](https://frankfurter.dev), [fawazahmed0/currency-api](https://github.com/fawazahmed0/exchange-api). Beijing student prices are typical public cost-of-living figures (2026), editable by the user. Fonts: Bricolage Grotesque and Instrument Sans (SIL Open Font License, Google Fonts).
+## Run locally
 
-## Privacy and safety
+```bash
+git clone <your-repo-url>
+cd tenang-app
+python3 -m http.server 8080
+# open http://localhost:8080
+```
 
-All data stays in the browser's localStorage. There is no server, no bank connection, no tracking and no credentials. The agent cannot send, pay, trade or withdraw. See the technical documentation for the full security design and known risks.
+You can also double-click `index.html` to open it directly in the browser.
+
+## Deploy (GitHub Pages)
+
+1. Push the four files to a GitHub repository.
+2. Go to **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`, then **Save**.
+4. After about a minute the app is live at `https://<username>.github.io/<repository>/`.
+
+Netlify, Vercel and Cloudflare Pages also work: no build command, publish directory = repository root.
+
+## Test cases
+
+Run these in the browser after opening the app.
+
+| ID | Feature | Steps | Expected result |
+| --- | --- | --- | --- |
+| TC01 | Budget | Open the app with default choices | Total ¥3,500; breakdown lists Housing ¥900, Food ¥1,500, Transport ¥150, Phone & data ¥50, Study ¥100, Other ¥200, Fun ¥600 |
+| TC02 | Budget | Choose Studio apartment and Restaurant regular | Total ¥8,900; comment warns that the budget is high |
+| TC03 | Budget | Type `abc` or `-50` in Transport and press Tab | Input is rejected and the old value comes back |
+| TC04 | Budget | Move the Fun money slider to ¥1,200, reload the page | Slider and total keep the new value (saved in the browser) |
+| TC05 | Tip for you | Choose Restaurant regular, open Tip for you | First tip is "The canteen rule" with "Because you picked Restaurant regular" |
+| TC06 | Tip for you | Press Next tip and Previous | Tips cycle; the list on the right highlights the current tip |
+| TC07 | Price feel | Pick Café latte at rate Rp 2,250 | ¥30 = Rp 67.500, feels like ≈ 3.1 glasses of es kopi susu |
+| TC08 | Price feel | Type `100` in "your own price" | ¥100 = Rp 225.000 at Rp 2,250 |
+| TC09 | Transfer check | Send Rp 5.000.000; quote fee Rp 50.000, rate 2300; market rate 2250 | Arrives ¥2,152.17; rate margin +2.22%; true cost Rp 157.609 (3.15%) |
+| TC10 | Transfer check | Keep the three example quotes | Best provider is marked ★ and the verdict says how many more yuan it delivers |
+| TC11 | Rate form | Choose Manual rate, type `9999`, press Use this rate | Error: rate must be between Rp 1.500 and Rp 3.500 per ¥1; nothing changes |
+| TC12 | Rate form | Choose Manual rate, type `2.300`, press Use this rate | Header shows "¥1 = Rp 2.300 · manual rate"; Budget, Price feel and Transfer check use 2,300 |
+| TC13 | Rate form | Reload the page after TC12 | Manual rate is still selected |
+| TC14 | Rate form | Choose Live rate, press Use this rate | Header shows the live rate with a green dot (or "offline" if the APIs are unreachable) |
+| TC15 | Rate | Turn off the internet and clear site data, then reload | Header shows "offline, example rate" (Rp 2.250); the app still works |
+| TC16 | Security | In DevTools, set localStorage `tenang.simple.v1` to `{"housing":"<script>","costs":{"fun":-5},"manualRate":99,"rateMode":"manual"}` and reload | Invalid values are ignored; defaults are used; no script runs |
+
+## Security and privacy
+
+- All data stays in the browser (localStorage). No account, no server, no bank connection, no tracking.
+- Tenang never moves money; Transfer check is a calculator only.
+- User text is always written with `textContent`, never `innerHTML`.
+- The Content-Security-Policy allows scripts only from the app itself and network requests only to the three exchange-rate APIs.
+- Every number from input or storage is validated (allowed range, valid option) before use.
+- Rate requests carry no user data, no cookies and no referrer.
+
+## Credits
+
+Exchange rates: ExchangeRate-API, Frankfurter (ECB), fawazahmed0 currency-api. Fonts: Bricolage Grotesque and Instrument Sans (SIL Open Font License, via Google Fonts). Beijing prices are typical student costs from public cost-of-living data (2026) and can be edited in the app.

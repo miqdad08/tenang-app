@@ -9,94 +9,31 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="logo" href="#today" aria-label="Tenang home">tenang<span>.</span></a>
-      <div class="fx" id="fx" aria-live="polite">
+      <a class="logo" href="#budget" aria-label="Tenang home">tenang<span>.</span></a>
+      <a class="fx" href="#transfer" id="fx" title="Change the exchange rate in Transfer check">
         <span class="fx-dot" id="fx-dot" aria-hidden="true"></span>
         <span id="fx-text">Loading rate…</span>
-        <button class="icon-btn" id="fx-refresh" type="button" aria-label="Refresh exchange rate" title="Refresh rate">↻</button>
-      </div>
-      <span class="pill" title="All data stays in this browser. Tenang never moves money.">Sandbox · on-device</span>
+      </a>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#today" data-tab="today">Today</a>
       <a href="#budget" data-tab="budget">Budget</a>
-      <a href="#expenses" data-tab="expenses">Expenses</a>
-      <a href="#transfer" data-tab="transfer">Transfer check</a>
+      <a href="#tips" data-tab="tips">Tip for you</a>
       <a href="#feel" data-tab="feel">Price feel</a>
-      <a href="#activity" data-tab="activity">Activity log</a>
-      <a href="#settings" data-tab="settings">Settings</a>
+      <a href="#transfer" data-tab="transfer">Transfer check</a>
     </nav>
   </header>
 
   <main id="main" tabindex="-1">
 
-    <!-- TODAY -->
-    <section class="view" id="view-today" aria-labelledby="h-today">
-      <h1 id="h-today" class="sr-only">Today</h1>
-      <div class="grid-2">
-        <div class="stack">
-          <article class="card hero-card">
-            <p class="eyebrow" id="today-date">Today</p>
-            <p class="big" id="today-spent">¥0</p>
-            <p class="muted" id="today-idr">≈ Rp 0 spent today</p>
-            <p class="status" id="today-status">Add your first expense to start.</p>
-            <dl class="kv">
-              <div><dt>Safe to spend today</dt><dd id="today-safe">¥0</dd></div>
-              <div><dt>This month</dt><dd id="today-month">¥0 of ¥0</dd></div>
-              <div><dt>Projected end of month</dt><dd id="today-proj">¥0</dd></div>
-            </dl>
-            <div class="bar" aria-hidden="true"><span id="today-bar"></span></div>
-          </article>
-
-          <article class="card" id="empty-card" hidden>
-            <h2>Start in one minute</h2>
-            <p>Build your Beijing budget, then add expenses as you go. Want to see it full first? Load a sample month. It stays in this browser.</p>
-            <div class="row">
-              <a class="btn" href="#budget">Build my budget</a>
-              <button class="btn ghost" type="button" id="demo-btn">Load sample month</button>
-            </div>
-          </article>
-
-          <article class="card tip-card">
-            <p class="eyebrow">Tip for you</p>
-            <h2 id="tip-title">Pay like a local</h2>
-            <p id="tip-body">Set up Alipay or WeChat Pay in your first week.</p>
-            <button class="btn ghost small" type="button" id="tip-next">Next tip</button>
-          </article>
-        </div>
-
-        <article class="card agent" aria-labelledby="h-agent">
-          <div class="agent-head">
-            <h2 id="h-agent">Ask Tenang</h2>
-            <span class="muted small">Type expenses or questions in plain words</span>
-          </div>
-          <ol class="chat" id="chat" aria-live="polite" aria-label="Conversation"></ol>
-          <div class="chips" id="examples" aria-label="Examples">
-            <button type="button" class="chip">lunch canteen 14</button>
-            <button type="button" class="chip">es kopi Rp 22.000</button>
-            <button type="button" class="chip">taxi 35 yesterday</button>
-            <button type="button" class="chip">how am I doing?</button>
-            <button type="button" class="chip">can I afford ¥300 shoes?</button>
-            <button type="button" class="chip">send ¥500 to my friend</button>
-          </div>
-          <form class="agent-form" id="agent-form" autocomplete="off">
-            <label for="agent-input" class="sr-only">Message</label>
-            <input id="agent-input" maxlength="200" placeholder="e.g. groceries 52 or how much did I spend on food?" required>
-            <button class="btn" type="submit">Send</button>
-          </form>
-        </article>
-      </div>
-    </section>
-
     <!-- BUDGET -->
-    <section class="view" id="view-budget" aria-labelledby="h-budget" hidden>
+    <section class="view" id="view-budget" aria-labelledby="h-budget">
       <header class="view-head">
         <h1 id="h-budget">Your Beijing month, in your numbers.</h1>
         <p class="muted">Pick how you want to live. Tenang uses typical Beijing student prices. You can edit every number.</p>
@@ -112,73 +49,53 @@
             <div class="options" id="opt-food"></div>
           </fieldset>
           <fieldset class="card">
-            <legend>Other monthly budgets (¥)</legend>
+            <legend>Other monthly costs (¥)</legend>
             <div class="form-grid" id="other-budgets"></div>
             <label class="slider-label" for="fun-slider">Fun money <strong id="fun-value">¥600</strong> / month</label>
             <input type="range" id="fun-slider" min="0" max="2000" step="50">
             <p class="muted small">Bubble tea, trips, karaoke. Fun that you plan is fun without guilt.</p>
           </fieldset>
         </div>
-        <div class="stack">
-          <article class="card total-card">
+        <div class="stack sticky">
+          <article class="card total-card" aria-live="polite">
             <p class="eyebrow">Estimated monthly budget</p>
             <p class="big" id="budget-total">¥0</p>
             <p class="muted" id="budget-idr">≈ Rp 0 / month</p>
-            <p class="small" id="budget-breakdown"></p>
+            <ul class="breakdown" id="budget-breakdown"></ul>
             <p class="status" id="budget-comment"></p>
           </article>
-          <article class="card">
-            <h2>This month so far</h2>
-            <ul class="progress-list" id="cat-progress"></ul>
+          <article class="card tip-card">
+            <p class="eyebrow">Tip for you</p>
+            <h2 id="mini-tip-title"></h2>
+            <p id="mini-tip-body"></p>
+            <a class="btn ghost small" href="#tips">More tips</a>
           </article>
           <p class="muted small">Prices are typical student costs in Beijing, from public cost-of-living data, 2026.</p>
         </div>
       </div>
     </section>
 
-    <!-- EXPENSES -->
-    <section class="view" id="view-expenses" aria-labelledby="h-exp" hidden>
+    <!-- TIPS -->
+    <section class="view" id="view-tips" aria-labelledby="h-tips" hidden>
       <header class="view-head">
-        <h1 id="h-exp">Expenses</h1>
-        <p class="muted">Add by hand here, or just tell the agent. Change a category and Tenang learns the word.</p>
-      </header>
-      <form class="card form-grid add-form" id="add-form" autocomplete="off">
-        <label>Amount<input id="f-amount" inputmode="decimal" maxlength="14" required placeholder="14"></label>
-        <label>Currency<select id="f-currency"><option value="CNY">¥ Yuan</option><option value="IDR">Rp Rupiah</option></select></label>
-        <label>Category<select id="f-category"></select></label>
-        <label>Date<input id="f-date" type="date" required></label>
-        <label class="span-2">Note<input id="f-note" maxlength="80" placeholder="Lunch, canteen"></label>
-        <div class="span-2 row"><button class="btn" type="submit">Add expense</button><span class="muted small" id="f-msg" role="status"></span></div>
-      </form>
-      <div class="row toolbar">
-        <label>Show <select id="filter-cat"><option value="">All categories</option></select></label>
-        <label>Month <input type="month" id="filter-month"></label>
-        <button class="btn ghost small" type="button" id="export-csv">Export CSV</button>
-      </div>
-      <p class="muted small" id="exp-summary"></p>
-      <div id="exp-list"></div>
-    </section>
-
-    <!-- TRANSFER -->
-    <section class="view" id="view-transfer" aria-labelledby="h-tr" hidden>
-      <header class="view-head">
-        <h1 id="h-tr">Which transfer delivers the most yuan?</h1>
-        <p class="muted">Compare what arrives, not the advertised rate. Enter the real quotes you got. <strong>Simulation only: Tenang never sends money.</strong></p>
+        <h1 id="h-tips">Tip for you</h1>
+        <p class="muted">Small habits that keep your Beijing month calm. Tips at the top are picked from your budget.</p>
       </header>
       <div class="grid-2">
-        <form class="card" id="tr-form" autocomplete="off">
-          <label class="block">Amount you send (Rp)<input id="tr-send" inputmode="numeric" maxlength="15" value="5.000.000"></label>
-          <p class="muted small" id="tr-mid"></p>
-          <div class="quotes" id="tr-quotes"></div>
-          <p class="muted small">Rate = rupiah per ¥1 that the provider offers. Example quotes are placeholders; replace them with real ones.</p>
-        </form>
-        <div class="stack">
-          <article class="card">
-            <h2>Result</h2>
-            <div class="table-wrap"><table class="table" id="tr-table" aria-label="Transfer comparison"></table></div>
-            <p class="status" id="tr-verdict"></p>
-          </article>
-        </div>
+        <article class="card tip-big" aria-live="polite">
+          <p class="eyebrow" id="tip-count">Tip 1 of 1</p>
+          <h2 id="tip-title"></h2>
+          <p id="tip-body"></p>
+          <p class="tag" id="tip-why"></p>
+          <div class="row">
+            <button class="btn ghost small" type="button" id="tip-prev">← Previous</button>
+            <button class="btn small" type="button" id="tip-next">Next tip →</button>
+          </div>
+        </article>
+        <article class="card">
+          <h2>All tips</h2>
+          <ol class="tip-list" id="tip-list"></ol>
+        </article>
       </div>
     </section>
 
@@ -186,15 +103,16 @@
     <section class="view" id="view-feel" aria-labelledby="h-feel" hidden>
       <header class="view-head">
         <h1 id="h-feel">What does a Beijing price actually feel like?</h1>
-        <p class="muted">Tenang converts a price into rupiah and into things you already know from Jakarta.</p>
+        <p class="muted">A price in a new currency is hard to feel at first. Tenang converts it into rupiah and into things you already know from Jakarta.</p>
       </header>
       <div class="grid-2">
         <article class="card">
           <p class="eyebrow">Pick something you will buy in week one</p>
           <div class="chips" id="feel-chips" role="radiogroup" aria-label="Item"></div>
-          <label class="block">Or type a price (¥)<input id="feel-custom" inputmode="decimal" maxlength="10" placeholder="30"></label>
+          <label class="block" for="feel-custom">Or type your own price (¥)</label>
+          <input id="feel-custom" inputmode="decimal" maxlength="10" placeholder="30">
         </article>
-        <article class="card feel-out">
+        <article class="card" aria-live="polite">
           <p class="big" id="feel-cny">¥30</p>
           <p class="muted" id="feel-idr">= Rp 0</p>
           <p class="eyebrow">Feels like</p>
@@ -205,78 +123,60 @@
       </div>
     </section>
 
-    <!-- ACTIVITY -->
-    <section class="view" id="view-activity" aria-labelledby="h-act" hidden>
+    <!-- TRANSFER CHECK -->
+    <section class="view" id="view-transfer" aria-labelledby="h-tr" hidden>
       <header class="view-head">
-        <h1 id="h-act">Activity log</h1>
-        <p class="muted">Every action by you, the agent or the system. Each entry carries the SHA-256 hash of the one before, so any edit breaks the chain.</p>
-      </header>
-      <div class="row toolbar">
-        <span class="badge" id="chain-status">Checking…</span>
-        <label>Who <select id="act-filter"><option value="">Everyone</option><option value="user">You</option><option value="agent">Agent</option><option value="system">System</option></select></label>
-        <button class="btn ghost small" type="button" id="act-export">Export log (JSON)</button>
-      </div>
-      <article class="card">
-        <h2>Permission tiers</h2>
-        <div class="table-wrap"><table class="table" id="tier-table" aria-label="Permission tiers"></table></div>
-      </article>
-      <div class="table-wrap card"><table class="table log" id="act-table" aria-label="Activity entries"></table></div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section class="view" id="view-settings" aria-labelledby="h-set" hidden>
-      <header class="view-head">
-        <h1 id="h-set">Settings and privacy</h1>
-        <p class="muted">Your data stays in this browser. No account, no bank connection, no tracking.</p>
+        <h1 id="h-tr">Which transfer delivers the most yuan?</h1>
+        <p class="muted">Compare what arrives, not the advertised rate. <strong>Simulation only: Tenang never sends money.</strong></p>
       </header>
       <div class="grid-2">
-        <form class="card stack" id="set-form" autocomplete="off">
-          <h2>Agent permissions</h2>
-          <label class="block">Auto-add limit (¥)<input id="s-limit" inputmode="decimal" maxlength="6"></label>
-          <p class="muted small">Expenses above this need your confirmation (tier 2).</p>
-          <label class="check"><input type="checkbox" id="s-confirm"> Ask me before every change</label>
-          <h2>Exchange rate</h2>
-          <label class="block">Fixed rate (Rp per ¥1, leave empty for live rate)<input id="s-rate" inputmode="decimal" maxlength="8" placeholder="Live"></label>
-          <p class="muted small" id="s-rate-msg" role="status"></p>
-          <button class="btn" type="submit">Save settings</button>
-        </form>
-        <article class="card stack">
-          <h2>Your data</h2>
-          <div class="row">
-            <button class="btn ghost" type="button" id="s-export">Export data (JSON)</button>
-            <label class="btn ghost file-btn">Import data<input type="file" id="s-import" accept="application/json,.json"></label>
-          </div>
-          <div class="row">
-            <button class="btn ghost" type="button" id="s-demo">Load sample month</button>
-            <button class="btn danger" type="button" id="s-reset">Delete all data</button>
-          </div>
-          <p class="muted small" id="s-msg" role="status"></p>
+        <div class="stack">
+          <form class="card" id="rate-form" autocomplete="off">
+            <fieldset class="plain">
+              <legend>Exchange rate to compare against</legend>
+              <label class="option">
+                <input type="radio" name="rate-mode" value="live" id="mode-live">
+                <span class="opt-main"><strong>Live rate</strong>
+                  <span class="muted small live-line"><span id="live-info">Loading…</span>
+                    <span class="tip-wrap">
+                      <button type="button" class="info" id="live-info-btn" aria-label="Rate details" aria-describedby="live-tip" aria-expanded="false">i</button>
+                      <span class="tooltip" role="tooltip" id="live-tip"></span>
+                    </span>
+                  </span>
+                </span>
+                <button class="btn ghost small" type="button" id="live-refresh">Refresh</button>
+              </label>
+              <label class="option">
+                <input type="radio" name="rate-mode" value="manual" id="mode-manual">
+                <span class="opt-main"><strong>Manual (fixed) rate</strong><span class="muted small">Use the rate from your bank or your own plan</span></span>
+              </label>
+              <label class="block" for="manual-rate">Rupiah per ¥1</label>
+              <input id="manual-rate" inputmode="decimal" maxlength="8" placeholder="2.250">
+              <div class="row">
+                <button class="btn small" type="submit">Use this rate</button>
+                <span class="small" id="rate-msg" role="status"></span>
+              </div>
+            </fieldset>
+          </form>
+          <form class="card" id="tr-form" autocomplete="off">
+            <label class="block" for="tr-send">Amount you send (Rp)</label>
+            <input id="tr-send" inputmode="numeric" maxlength="15" value="5.000.000">
+            <div class="quotes" id="tr-quotes"></div>
+            <p class="muted small">Rate = rupiah per ¥1 that the provider offers. Example quotes are placeholders; replace them with the real quotes you got.</p>
+          </form>
+        </div>
+        <article class="card sticky" aria-live="polite">
+          <h2>Result</h2>
+          <p class="muted small" id="tr-mid"></p>
+          <div class="table-wrap"><table class="table" id="tr-table" aria-label="Transfer comparison"></table></div>
+          <p class="status" id="tr-verdict"></p>
         </article>
       </div>
     </section>
   </main>
 
-  <dialog id="confirm-dialog" aria-labelledby="cd-title">
-    <div class="stack">
-      <h2 id="cd-title">Please confirm</h2>
-      <p id="cd-body"></p>
-      <ul id="cd-reasons" class="reasons"></ul>
-      <div class="row">
-        <button class="btn" type="button" id="cd-yes">Confirm</button>
-        <button class="btn ghost" type="button" id="cd-no">Cancel</button>
-      </div>
-    </div>
-  </dialog>
-
   <footer class="footer">tenang · budgeting for international students · Jakarta → Beijing</footer>
 
-  <script src="js/utils.js"></script>
-  <script src="js/fx.js"></script>
-  <script src="js/audit.js"></script>
-  <script src="js/store.js"></script>
-  <script src="js/agent.js"></script>
-  <script src="js/agent-runtime.js"></script>
-  <script src="js/demo.js"></script>
-  <script src="js/app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
